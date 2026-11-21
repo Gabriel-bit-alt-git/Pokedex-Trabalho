@@ -25,6 +25,15 @@ app.use('/users', usersRouter);
 app.get('/fibbauru', (req, res) => {
 res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+app.get('/cadastro', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM aluno');
+    res.render('aluno', { alunos: rows});
+  } catch (error) {
+    console.error('Erro ao buscar alunos:', error);
+    res.status(500).send('Erro interno no servidor.');
+  }
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
