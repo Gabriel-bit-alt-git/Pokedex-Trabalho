@@ -33,23 +33,27 @@ app.get('/api/pokedex', async (req, res) => {
                 p.nome AS nome_pokemon,
                 p.quant_evolucoes,
                 p.geracao,
-                t.nome_tipo
-            FROM pokedex b, tipos t
-            WHERE p.id_tipo = t.id_tipo AND p.id_tipo2 = t.id_tipo
+                t1.nome_tipo AS nome_tipo,
+                t2.nome_tipo AS nome_tipo2
+            FROM pokedex p
+            LEFT JOIN tipos t1 ON p.id_tipo = t1.id_tipo
+            LEFT JOIN tipos t2 ON p.id_tipo2 = t2.id_tipo
+            WHERE 1 = 1
         `;
 
         const parametros = [];
 
         if (req.query.pesquisa) {
-            sql += ` AND (p.nome LIKE ? OR p.id_tipo LIKE ? AND p.id_tipo2 LIKE ?)`;
+            sql += ` AND (p.nome LIKE ? OR p.id_tipo LIKE ? OR p.id_tipo2 LIKE ?)`;
 
             parametros.push(
+                '%' + req.query.pesquisa + '%',
                 '%' + req.query.pesquisa + '%',
                 '%' + req.query.pesquisa + '%'
             );
         }
 
-        sql += ' ORDER BY b.ecos';
+        sql += ' ORDER BY p.id_pokemon';
 
         const [rows] = await db.query(sql, parametros);
 
@@ -77,7 +81,7 @@ app.post('/api/pokedex', async (req, res) => {
         const [resultado] = await db.query(sql, [
             id_pokemon,
             id_tipo,
-            id_tipo2,
+            id_tipo2 ?? null,
             nome,
             quant_evolucoes,
             geracao
@@ -85,7 +89,7 @@ app.post('/api/pokedex', async (req, res) => {
 
         res.status(201).json({
             mensagem: 'Pokemon Registrado.',
-            id_criatura: resultado.insertId
+            id_pokemon: resultado.insertId
         });
 
     } catch (erro) {
@@ -103,7 +107,7 @@ app.put('/api/pokedex/:id', async (req, res) => {
 
         const { id_pokemon, id_tipo, id_tipo2, nome, quant_evolucoes, geracao } = req.body;
 
-        if (!id_pokemon || !id_tipo || !id_tipo2 || !nome || quant_evolucoes == null || geracao == null) {
+        if (!id_pokemon || !id_tipo || !nome || quant_evolucoes == null || geracao == null) {
             return res.status(400).json({
                 erro: 'Preencha todos os campos.'
             });
@@ -116,8 +120,9 @@ app.put('/api/pokedex/:id', async (req, res) => {
                  id_tipo2 = ?,
                  nome = ?,
                  quant_evolucoes = ?,
-                 geracao = ?`,
-            [id_pokemon, id_tipo, id_tipo2, nome, quant_evolucoes, geracao, id]
+                 geracao = ?
+             WHERE id_pokemon = ?`,
+            [id_pokemon, id_tipo, id_tipo2 ?? null, nome, quant_evolucoes, geracao, id]
         );
 
         if (resultado.affectedRows === 0) {
@@ -169,18 +174,18 @@ app.delete('/api/pokedex/:id', async (req, res) => {
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 module.exports = app;
