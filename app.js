@@ -22,9 +22,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000');
-});
 app.get('/fibbauru', (req, res) => {
 res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
