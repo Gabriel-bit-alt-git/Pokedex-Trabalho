@@ -63,7 +63,7 @@ app.get('/api/pokedex', async (req, res) => {
         console.error(err);
 
         res.status(500).json({
-            erro: 'Erro ao buscar pokemon: ' + err.message
+            erro: 'Erro ao buscar pokémon: ' + err.message
         });
     }
 });
@@ -87,15 +87,15 @@ app.post('/api/pokedex', async (req, res) => {
         ]);
 
         res.status(201).json({
-            mensagem: 'Pokemon Registrado.',
+            mensagem: 'Pokémon Registrado.',
             id_pokemon: resultado.insertId
         });
 
     } catch (erro) {
-        console.error('Erro ao registrar pokemon:', erro);
+        console.error('Erro ao registrar pokémon:', erro);
 
         res.status(500).json({
-            erro: 'Erro ao registrar pokemon.'
+            erro: 'Erro ao registrar pokémon.'
         });
     }
 });
@@ -125,19 +125,19 @@ app.put('/api/pokedex/:id', async (req, res) => {
 
         if (resultado.affectedRows === 0) {
             return res.status(404).json({
-                erro: 'Pokemon não encontrado.'
+                erro: 'Pokémon não encontrado.'
             });
         }
 
         res.json({
-            mensagem: 'Pokemon atualizado com sucesso.'
+            mensagem: 'Pokémon atualizado com sucesso.'
         });
 
     } catch (erro) {
-        console.error('Erro ao atualizar pokemon:', erro);
+        console.error('Erro ao atualizar pokémon:', erro);
 
         res.status(500).json({
-            erro: 'Erro ao atualizar pokemon.'
+            erro: 'Erro ao atualizar pokémon.'
         });
     }
 });
@@ -153,19 +153,19 @@ app.delete('/api/pokedex/:id', async (req, res) => {
 
         if (resultado.affectedRows === 0) {
             return res.status(404).json({
-                erro: 'Pokemon não encontrado.'
+                erro: 'Pokémon não encontrado.'
             });
         }
 
         res.json({
-            mensagem: 'Pokemon deletado com sucesso.'
+            mensagem: 'Pokémon deletado com sucesso.'
         });
 
     } catch (erro) {
-        console.error('Erro ao deletar pokemon:', erro);
+        console.error('Erro ao deletar pokémon:', erro);
 
         res.status(500).json({
-            erro: 'Erro ao deletar pokemon.'
+            erro: 'Erro ao deletar pokémon.'
         });
     }
 });

@@ -1,85 +1,140 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pokedex</title>
-
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 3px solid #ccc; padding: 10px; text-align: center; }
-        th { background: #f0f0f0; }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/pokedex.css">
 </head>
 
 <body>
 
-    <div id="mensagem"></div>
+    <div class="pokedex">
 
-    <h2 id="titulo-form">Novo Pokemon</h2>
+        <!-- Topo da Pokedex -->
+        <header class="topo">
+            <div class="lente">
+                <div class="lente-brilho"></div>
+            </div>
+            <div class="luzes">
+                <span class="luz vermelha"></span>
+                <span class="luz amarela"></span>
+                <span class="luz verde"></span>
+            </div>
+            <h1 class="logo">POKÉDEX</h1>
+        </header>
 
-    <form id="form-pokemon">
+        <main class="corpo">
 
-        <input type="hidden" id="id_pokemon">
+            <div id="mensagem" class="mensagem"></div>
 
-        <label>Nome
-            <input type="text" id="nome" required>
-        </label>
+            <!-- Cadastro / edição -->
+            <section class="painel">
 
-        <label>Primeiro Tipo
-            <input type="number" id="id_tipo" required>
-        </label>
+                <h2 id="titulo-form" class="titulo-painel">Novo Pokemon</h2>
 
-        <label>Segundo Tipo
-            <input type="number" id="id_tipo2">
-        </label>
+                <div class="cadastro">
 
-        <label>Quantidade de Evoluções
-            <input type="number" id="quant_evolucoes" required>
-        </label>
+                    <!-- Espaço para a foto do Pokémon -->
+                    <div class="visor">
+                        <div class="visor-tela">
+                            <div class="foto-pokemon" id="foto-preview">
+                                <span class="pokebola"></span>
+                            </div>
+                        </div>
+                        <div class="visor-nome" id="preview-nome">???</div>
+                        <div class="visor-tipos">
+                            <div class="slot-tipo" id="slot-tipo1">
+                                <span class="icone-tipo"></span>
+                                <span class="texto-tipo">Tipo 1</span>
+                            </div>
+                            <div class="slot-tipo" id="slot-tipo2">
+                                <span class="icone-tipo"></span>
+                                <span class="texto-tipo">Tipo 2</span>
+                            </div>
+                        </div>
+                    </div>
 
-        <label>Geração
-            <input type="number" id="geracao" required>
-        </label>
+                    <form id="form-pokemon">
 
-        <div class="botoes">
-            <button type="submit" id="btn-salvar">Salvar</button>
-        </div>
+                        <input type="hidden" id="id_pokemon">
 
-    </form>
+                        <label>Nome
+                            <input type="text" id="nome" required>
+                        </label>
 
-    <h2>Pesquisar Pokemon</h2>
+                        <label>Primeiro Tipo
+                            <input type="number" id="id_tipo" required>
+                        </label>
 
-    <form id="form-pesquisa" onsubmit="pesquisar(event)">
-        <label>Nome ou Tipo
-            <input type="text" id="pesquisa">
-        </label>
+                        <label>Segundo Tipo
+                            <input type="number" id="id_tipo2">
+                        </label>
 
-        <button type="submit">Pesquisar</button>
+                        <label>Quantidade de Evoluções
+                            <input type="number" id="quant_evolucoes" required>
+                        </label>
 
-        <button type="button" onclick="limparPesquisa()">
-            Limpar
-        </button>
-    </form>
+                        <label>Geração
+                            <input type="number" id="geracao" required>
+                        </label>
 
-    <h1>Lista de Pokemon</h1>
+                        <div class="botoes">
+                            <button type="submit" id="btn-salvar">Salvar</button>
+                        </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Primeiro Tipo</th>
-                <th>Segundo Tipo</th>
-                <th>Evoluções</th>
-                <th>Geração</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
+                    </form>
+                </div>
+            </section>
 
-        <tbody id="tabela-pokemon"></tbody>
-    </table>
+            <!-- Pesquisa -->
+            <section class="painel">
+
+                <h2 class="titulo-painel">Pesquisar Pokemon</h2>
+
+                <form id="form-pesquisa" onsubmit="pesquisar(event)">
+                    <label>Nome ou Tipo
+                        <input type="text" id="pesquisa">
+                    </label>
+
+                    <button type="submit">Pesquisar</button>
+
+                    <button type="button" class="btn-secundario" onclick="limparPesquisa()">
+                        Limpar
+                    </button>
+                </form>
+            </section>
+
+            <!-- Lista -->
+            <section class="painel tela-lista">
+
+                <h1 class="titulo-lista">Lista de Pokemon</h1>
+
+                <div class="tabela-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Primeiro Tipo</th>
+                                <th>Segundo Tipo</th>
+                                <th>Evoluções</th>
+                                <th>Geração</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tabela-pokemon"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
 
     <script>
 
@@ -232,6 +287,9 @@
         });
 
     </script>
+
+    <!-- Apenas visual: cores dos tipos, espaços de imagem e pré-visualização -->
+    <script src="/js/tema.js"></script>
 
 </body>
 </html>
