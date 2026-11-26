@@ -6,26 +6,26 @@
 (function () {
     'use strict';
 
-    // Cores oficiais de cada tipo (nomes em português e inglês)
+    // Cores oficiais de cada tipo 
     const CORES = {
         normal: '#A8A77A',
-        fogo: '#EE8130',        fire: '#EE8130',
-        agua: '#6390F0',        water: '#6390F0',
-        planta: '#7AC74C',      grama: '#7AC74C',   grass: '#7AC74C',
-        eletrico: '#F7D02C',    electric: '#F7D02C',
-        gelo: '#96D9D6',        ice: '#96D9D6',
-        lutador: '#C22E28',     lutadora: '#C22E28', fighting: '#C22E28',
-        veneno: '#A33EA1',      poison: '#A33EA1',
-        terra: '#E2BF65',       solo: '#E2BF65',    ground: '#E2BF65',
-        voador: '#A98FF3',      flying: '#A98FF3',
-        psiquico: '#F95587',    psychic: '#F95587',
-        inseto: '#A6B91A',      bug: '#A6B91A',
-        pedra: '#B6A136',       rock: '#B6A136',
-        fantasma: '#735797',    ghost: '#735797',
-        dragao: '#6F35FC',      dragon: '#6F35FC',
-        sombrio: '#705746',     noturno: '#705746', dark: '#705746',
-        aco: '#B7B7CE',         metal: '#B7B7CE',   steel: '#B7B7CE',
-        fada: '#D685AD',        fairy: '#D685AD'
+        fogo: '#EE8130',        
+        agua: '#6390F0',        
+        planta: '#7AC74C',      
+        eletrico: '#F7D02C',    
+        gelo: '#96D9D6',        
+        lutador: '#C22E28',     
+        venenoso: '#A33EA1',
+        terrestre: '#E2BF65',
+        voador: '#A98FF3',      
+        psiquico: '#F95587',    
+        inseto: '#A6B91A',      
+        pedra: '#B6A136',       
+        fantasma: '#735797',    
+        dragao: '#6F35FC',      
+        sombrio: '#705746',     
+        aco: '#B7B7CE',         
+        fada: '#D685AD',        
     };
 
     function slug(texto) {
@@ -39,6 +39,13 @@
     function corDoTipo(nome) {
         return CORES[slug(nome)] || null;
     }
+
+    /* ---------- Colinha de tipos ---------- */
+
+    document.querySelectorAll('.colinha .tipo-badge').forEach(function (badge) {
+        const cor = corDoTipo(badge.textContent);
+        if (cor) badge.style.setProperty('--cor-tipo', cor);
+    });
 
     /* ---------- Tabela ---------- */
 
@@ -73,7 +80,15 @@
 
             const foto = document.createElement('div');
             foto.className = 'foto-mini';
-            foto.innerHTML = '<span class="pokebola"></span>';
+            if (tr.dataset.foto) {
+                const img = document.createElement('img');
+                img.src = tr.dataset.foto;
+                img.alt = nome;
+                img.onerror = function () { foto.innerHTML = '<span class="pokebola"></span>'; };
+                foto.appendChild(img);
+            } else {
+                foto.innerHTML = '<span class="pokebola"></span>';
+            }
 
             wrap.appendChild(foto);
             wrap.appendChild(document.createTextNode(nome));
@@ -142,9 +157,127 @@
         }
     }
 
+    /* ---------- Foto do Pokémon ---------- */
+
+    const inputFoto = document.getElementById('foto');            // guarda o caminho ou a imagem nova (data URL)
+    const inputArquivo = document.getElementById('foto_arquivo');
+    const btnEnviar = document.getElementById('btn-enviar-foto');
+    const btnRemover = document.getElementById('btn-remover-foto');
+    const fotoPreview = document.getElementById('foto-preview');
+    const galeria = document.getElementById('galeria-grade');
+
+    const TAMANHO_MAXIMO_LADO = 400; // a foto é reduzida no navegador antes de ser enviada
+    const POKEBOLA_HTML = '<span class="pokebola"></span>';
+
+    function mostrarFoto() {
+        if (!fotoPreview || !inputFoto) return;
+        const valor = inputFoto.value;
+        fotoPreview.innerHTML = POKEBOLA_HTML;
+        if (!valor) return;
+
+        const img = document.createElement('img');
+        img.alt = 'Foto do Pokémon';
+        img.onerror = function () { fotoPreview.innerHTML = POKEBOLA_HTML; };
+        img.src = valor;
+        fotoPreview.innerHTML = '';
+        fotoPreview.appendChild(img);
+
+        // destaca a imagem pronta escolhida
+        if (galeria) {
+            galeria.querySelectorAll('button').forEach(function (b) {
+                b.classList.toggle('selecionada', b.dataset.caminho === valor);
+            });
+        }
+    }
+
+    // Lê o arquivo, reduz para no máximo 400px e guarda como data URL em #foto
+    function prepararArquivo(arquivo) {
+        if (!arquivo) return;
+        if (!/^image\/(png|jpeg|webp)$/.test(arquivo.type)) {
+            alert('Escolha uma imagem PNG, JPG ou WEBP.');
+            inputArquivo.value = '';
+            return;
+        }
+
+        const leitor = new FileReader();
+        leitor.onload = function () {
+            const img = new Image();
+            img.onload = function () {
+                const escala = Math.min(1, TAMANHO_MAXIMO_LADO / Math.max(img.width, img.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, Math.round(img.width * escala));
+                canvas.height = Math.max(1, Math.round(img.height * escala));
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                inputFoto.value = canvas.toDataURL('image/png', 0.85);
+                mostrarFoto();
+            };
+            img.onerror = function () { alert('Não foi possível abrir essa imagem.'); };
+            img.src = leitor.result;
+        };
+        leitor.readAsDataURL(arquivo);
+    }
+
+    if (btnEnviar && inputArquivo && inputFoto) {
+        btnEnviar.addEventListener('click', function () { inputArquivo.click(); });
+        inputArquivo.addEventListener('change', function () { prepararArquivo(inputArquivo.files[0]); });
+    }
+
+    if (btnRemover && inputFoto) {
+        btnRemover.addEventListener('click', function () {
+            inputFoto.value = '';
+            if (inputArquivo) inputArquivo.value = '';
+            mostrarFoto();
+        });
+    }
+
+    // Galeria de imagens prontas (arquivos da pasta public/images/prontas)
+    if (galeria && inputFoto) {
+        fetch('/api/imagens-prontas')
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .then(function (caminhos) {
+                if (!caminhos.length) {
+                    galeria.innerHTML = '<span class="galeria-vazia">Nenhuma imagem pronta.</span>';
+                    return;
+                }
+                caminhos.forEach(function (caminho) {
+                    const botao = document.createElement('button');
+                    botao.type = 'button';
+                    botao.className = 'galeria-item';
+                    botao.dataset.caminho = caminho;
+                    botao.title = caminho.split('/').pop().replace(/\.[^.]+$/, '');
+
+                    const img = document.createElement('img');
+                    img.src = caminho;
+                    img.alt = botao.title;
+                    botao.appendChild(img);
+
+                    botao.addEventListener('click', function () {
+                        inputFoto.value = caminho;
+                        if (inputArquivo) inputArquivo.value = '';
+                        mostrarFoto();
+                    });
+                    galeria.appendChild(botao);
+                });
+                mostrarFoto();
+            })
+            .catch(function () { /* só visual: ignora */ });
+    }
+
     let ultimo = '';
+    let ultimaFoto = null;
 
     function atualizarPreview() {
+        // a foto também muda por código (editar / salvar), então é conferida aqui
+        if (inputFoto) {
+            const assinatura = inputFoto.value.length + ':' + inputFoto.value.slice(-24);
+            if (assinatura !== ultimaFoto) {
+                ultimaFoto = assinatura;
+                if (!inputFoto.value && inputArquivo) inputArquivo.value = '';
+                mostrarFoto();
+            }
+        }
+
         const chave = [inputNome.value, inputTipo1.value, inputTipo2.value,
             (typeof listaPokemon !== 'undefined' ? listaPokemon.length : 0)].join('|');
         if (chave === ultimo) return;

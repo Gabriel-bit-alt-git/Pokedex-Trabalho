@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/pokedex.css">
+    <link rel="stylesheet" href="/stylesheets/pokedex.css">
 </head>
 
 <body>
@@ -56,11 +56,26 @@
                                 <span class="texto-tipo">Tipo 2</span>
                             </div>
                         </div>
+
+                        <!-- Escolher a foto: enviar do computador ou usar uma imagem pronta -->
+                        <div class="visor-foto-acoes">
+                            <button type="button" id="btn-enviar-foto">Enviar foto</button>
+                            <button type="button" id="btn-remover-foto" class="btn-secundario">Remover</button>
+                            <input type="file" id="foto_arquivo" accept="image/png,image/jpeg,image/webp" hidden>
+                        </div>
+                        <div class="galeria">
+                            <p class="galeria-titulo">Imagens prontas</p>
+                            <div class="galeria-grade" id="galeria-grade"></div>
+                        </div>
                     </div>
+
+                    <div class="coluna-form">
 
                     <form id="form-pokemon">
 
                         <input type="hidden" id="id_pokemon">
+
+                        <input type="hidden" id="foto">
 
                         <label>Nome
                             <input type="text" id="nome" required>
@@ -87,6 +102,47 @@
                         </div>
 
                     </form>
+
+                    <!-- Colinha: número de cada tipo (mesma ordem da tabela "tipos" do banco) -->
+                    <div class="colinha">
+                        <h3 class="colinha-titulo">Colinha de tipos</h3>
+                        <table class="colinha-tabela">
+                            <tbody>
+                                <tr>
+                                    <td class="num">1</td><td><span class="tipo-badge">Normal</span></td>
+                                    <td class="num">2</td><td><span class="tipo-badge">Lutador</span></td>
+                                    <td class="num">3</td><td><span class="tipo-badge">Voador</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="num">4</td><td><span class="tipo-badge">Venenoso</span></td>
+                                    <td class="num">5</td><td><span class="tipo-badge">Terrestre</span></td>
+                                    <td class="num">6</td><td><span class="tipo-badge">Pedra</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="num">7</td><td><span class="tipo-badge">Inseto</span></td>
+                                    <td class="num">8</td><td><span class="tipo-badge">Fantasma</span></td>
+                                    <td class="num">9</td><td><span class="tipo-badge">Aço</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="num">10</td><td><span class="tipo-badge">Fogo</span></td>
+                                    <td class="num">11</td><td><span class="tipo-badge">Água</span></td>
+                                    <td class="num">12</td><td><span class="tipo-badge">Planta</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="num">13</td><td><span class="tipo-badge">Elétrico</span></td>
+                                    <td class="num">14</td><td><span class="tipo-badge">Psíquico</span></td>
+                                    <td class="num">15</td><td><span class="tipo-badge">Gelo</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="num">16</td><td><span class="tipo-badge">Dragão</span></td>
+                                    <td class="num">17</td><td><span class="tipo-badge">Sombrio</span></td>
+                                    <td class="num">18</td><td><span class="tipo-badge">Fada</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    </div>
                 </div>
             </section>
 
@@ -161,7 +217,7 @@
                 }
 
                 tbody.innerHTML = pokemon.map(p => `
-                    <tr>
+                    <tr data-foto="${p.foto ?? ''}">
                         <td>${p.id_pokemon}</td>
                         <td>${p.nome_pokemon}</td>
                         <td>${p.nome_tipo ?? ''}</td>
@@ -197,6 +253,7 @@
             document.getElementById('id_tipo2').value = p.id_tipo2 ?? '';
             document.getElementById('quant_evolucoes').value = p.quant_evolucoes;
             document.getElementById('geracao').value = p.geracao;
+            document.getElementById('foto').value = p.foto ?? '';
 
             document.getElementById('titulo-form').textContent = 'Editar Pokemon';
 
@@ -253,7 +310,9 @@
 
                 quant_evolucoes: document.getElementById('quant_evolucoes').value,
 
-                geracao: document.getElementById('geracao').value
+                geracao: document.getElementById('geracao').value,
+
+                foto: document.getElementById('foto').value || null
 
             };
 
@@ -278,6 +337,8 @@
 
                 document.getElementById('id_pokemon').value = '';
 
+                document.getElementById('foto').value = '';
+
                 document.getElementById('titulo-form').textContent = 'Novo Pokemon';
 
                 carregarPokemon();
@@ -289,7 +350,7 @@
     </script>
 
     <!-- Apenas visual: cores dos tipos, espaços de imagem e pré-visualização -->
-    <script src="/js/tema.js"></script>
+    <script src="/javascripts/tema.js"></script>
 
 </body>
 </html>

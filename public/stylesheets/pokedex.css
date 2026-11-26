@@ -187,7 +187,46 @@ body {
     overflow: hidden;
 }
 
-.foto-pokemon img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.foto-pokemon img { width: 100%; height: 100%; object-fit: contain; }
+
+/* Botões e galeria de fotos (dentro do visor vermelho) */
+.visor-foto-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.visor-foto-acoes button { font-size: 8px; padding: 9px 6px; }
+.visor-foto-acoes #btn-enviar-foto { background: #2e9d3f; box-shadow: 0 4px 0 #1b6427, 0 4px 0 3px var(--preto); }
+
+.galeria {
+    margin-top: 14px;
+    background: #fff;
+    border: 4px solid var(--preto);
+    border-radius: 10px;
+    padding: 8px;
+}
+
+.galeria-titulo {
+    margin: 0 0 8px;
+    font-family: var(--fonte-pixel);
+    font-size: 8px;
+    text-transform: uppercase;
+    color: var(--preto);
+}
+
+.galeria-grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+
+.galeria-vazia { grid-column: 1 / -1; font-size: 18px; color: #666; }
+
+.galeria-grade .galeria-item {
+    padding: 3px;
+    aspect-ratio: 1;
+    background: var(--tela);
+    border: 3px solid var(--tela-escura);
+    border-radius: 6px;
+    box-shadow: none;
+    text-shadow: none;
+}
+.galeria-grade .galeria-item:active { transform: none; box-shadow: none; }
+.galeria-grade .galeria-item:hover { filter: brightness(1.08); }
+.galeria-grade .galeria-item.selecionada { border-color: var(--vermelho); box-shadow: 0 0 0 3px var(--azul); }
+.galeria-grade .galeria-item img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
 .visor-nome {
     margin: 12px 0 8px;
@@ -261,6 +300,49 @@ body {
 
 .foto-mini .pokebola { width: 100%; border-width: 2px; }
 .foto-mini .pokebola::after { border-width: 2px; }
+
+/* ===== Coluna do formulário + colinha de tipos ===== */
+.coluna-form { display: grid; gap: 22px; min-width: 0; }
+
+.colinha {
+    background: var(--tela);
+    border: 4px solid var(--preto);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: inset 0 0 18px rgba(0,0,0,.4);
+}
+
+.colinha-titulo {
+    margin: 0 0 10px;
+    font-family: var(--fonte-pixel);
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--tela-escura);
+}
+
+.colinha-tabela { width: 100%; border-collapse: separate; border-spacing: 6px 6px; }
+
+.colinha-tabela td { border: 0; padding: 0; text-align: left; }
+
+.colinha-tabela td.num {
+    width: 34px;
+    text-align: center;
+    font-family: var(--fonte-pixel);
+    font-size: 10px;
+    color: #fff;
+    background: var(--tela-escura);
+    border-radius: 6px;
+    padding: 6px 2px;
+}
+
+.colinha-tabela .tipo-badge { width: 100%; }
+
+@media (max-width: 800px) {
+    .colinha-tabela, .colinha-tabela tbody, .colinha-tabela tr { display: block; }
+    .colinha-tabela tr { display: grid; grid-template-columns: 34px 1fr; gap: 6px; margin-bottom: 6px; }
+    .colinha-tabela tr td { display: block; }
+    .colinha-tabela { border-spacing: 0; }
+}
 
 /* ===== Formulários ===== */
 form { display: grid; gap: 14px; }
@@ -375,13 +457,13 @@ td button:last-child { background: var(--azul-escuro); box-shadow: 0 4px 0 #0d3c
     width: 48px; height: 48px;
     display: grid;
     place-items: center;
-    padding: 6px;
+    padding: 0px;
     background: var(--tela);
     border: 3px solid var(--tela-escura);
     border-radius: 6px;
     overflow: hidden;
 }
-.foto-mini img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.foto-mini img { width: 100%; height: 100%; object-fit: contain; }
 
 /* ===== Responsivo ===== */
 @media (max-width: 800px) {
