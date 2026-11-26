@@ -1,11 +1,237 @@
+
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>Pokedex</title>
+
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 3px solid #ccc; padding: 10px; text-align: center; }
+        th { background: #f0f0f0; }
+    </style>
+</head>
+
+<body>
+
+    <div id="mensagem"></div>
+
+    <h2 id="titulo-form">Novo Pokemon</h2>
+
+    <form id="form-pokemon">
+
+        <input type="hidden" id="id_pokemon">
+
+        <label>Nome
+            <input type="text" id="nome" required>
+        </label>
+
+        <label>Primeiro Tipo
+            <input type="number" id="id_tipo" required>
+        </label>
+
+        <label>Segundo Tipo
+            <input type="number" id="id_tipo2">
+        </label>
+
+        <label>Quantidade de Evoluções
+            <input type="number" id="quant_evolucoes" required>
+        </label>
+
+        <label>Geração
+            <input type="number" id="geracao" required>
+        </label>
+
+        <div class="botoes">
+            <button type="submit" id="btn-salvar">Salvar</button>
+        </div>
+
+    </form>
+
+    <h2>Pesquisar Pokemon</h2>
+
+    <form id="form-pesquisa" onsubmit="pesquisar(event)">
+        <label>Nome ou Tipo
+            <input type="text" id="pesquisa">
+        </label>
+
+        <button type="submit">Pesquisar</button>
+
+        <button type="button" onclick="limparPesquisa()">
+            Limpar
+        </button>
+    </form>
+
+    <h1>Lista de Pokemon</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Primeiro Tipo</th>
+                <th>Segundo Tipo</th>
+                <th>Evoluções</th>
+                <th>Geração</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody id="tabela-pokemon"></tbody>
+    </table>
+
+    <script>
+
+        async function carregarPokemon() {
+
+            const tbody = document.getElementById('tabela-pokemon');
+            const pesquisa = document.getElementById('pesquisa').value;
+
+            try {
+
+                const resposta = await fetch('/api/pokedex?pesquisa=' + encodeURIComponent(pesquisa));
+                const pokemon = await resposta.json();
+
+                if (!resposta.ok) {
+                    throw new Error(pokemon.erro);
+                }
+
+                listaPokemon = pokemon;
+
+                if (pokemon.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="7">Nenhum Pokemon encontrado.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = pokemon.map(p => `
+                    <tr>
+                        <td>${p.id_pokemon}</td>
+                        <td>${p.nome_pokemon}</td>
+                        <td>${p.nome_tipo ?? ''}</td>
+                        <td>${p.nome_tipo2 ?? ''}</td>
+                        <td>${p.quant_evolucoes}</td>
+                        <td>${p.geracao}</td>
+                        <td>
+                            <button onclick="editarPokemon(${p.id_pokemon})">Editar</button>
+                            <button onclick="deletarPokemon(${p.id_pokemon})">Deletar</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (erro) {
+
+                tbody.innerHTML =
+                    `<tr><td colspan="7">${erro.message}</td></tr>`;
+
+            }
+        }
+
+        let listaPokemon = [];
+
+        carregarPokemon();
+
+        function editarPokemon(id) {
+
+            const p = listaPokemon.find(pokemon => pokemon.id_pokemon == id);
+
+            document.getElementById('id_pokemon').value = p.id_pokemon;
+            document.getElementById('nome').value = p.nome_pokemon;
+            document.getElementById('id_tipo').value = p.id_tipo;
+            document.getElementById('id_tipo2').value = p.id_tipo2 ?? '';
+            document.getElementById('quant_evolucoes').value = p.quant_evolucoes;
+            document.getElementById('geracao').value = p.geracao;
+
+            document.getElementById('titulo-form').textContent = 'Editar Pokemon';
+
+            window.scrollTo(0, 0);
+        }
+
+        async function deletarPokemon(id) {
+
+            if (!confirm('Deseja realmente deletar este Pokemon?')) {
+                return;
+            }
+
+            const resposta = await fetch(`/api/pokedex/${id}`, {
+                method: "DELETE"
+            });
+
+            const resultado = await resposta.json();
+
+            if (resposta.ok) {
+                alert("Pokemon excluído!");
+                carregarPokemon();
+            }
+
+            else {
+                alert("Erro ao excluir Pokemon.");
+            }
+        }
+
+        function pesquisar(evento) {
+            evento.preventDefault();
+            carregarPokemon();
+        }
+
+        function limparPesquisa() {
+            document.getElementById('pesquisa').value = '';
+            carregarPokemon();
+        }
+
+        document.getElementById('form-pokemon').addEventListener('submit', async (evento) => {
+
+            evento.preventDefault();
+
+            const id = document.getElementById('id_pokemon').value;
+
+            const pokemon = {
+
+                id_pokemon: id || null,
+
+                nome: document.getElementById('nome').value,
+
+                id_tipo: document.getElementById('id_tipo').value,
+
+                id_tipo2: document.getElementById('id_tipo2').value || null,
+
+                quant_evolucoes: document.getElementById('quant_evolucoes').value,
+
+                geracao: document.getElementById('geracao').value
+
+            };
+
+            const metodo = id ? 'PUT' : 'POST';
+
+            const endereco = id ? '/api/pokedex/' + id : '/api/pokedex';
+
+            const resposta = await fetch(endereco, {
+                method: metodo,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(pokemon)
+            });
+
+            const resultado = await resposta.json();
+
+            document.getElementById('mensagem').textContent =
+                resultado.mensagem ?? resultado.erro;
+
+            if (resposta.ok) {
+
+                document.getElementById('form-pokemon').reset();
+
+                document.getElementById('id_pokemon').value = '';
+
+                document.getElementById('titulo-form').textContent = 'Novo Pokemon';
+
+                carregarPokemon();
+
+            }
+
+        });
+
+    </script>
+
+</body>
 </html>

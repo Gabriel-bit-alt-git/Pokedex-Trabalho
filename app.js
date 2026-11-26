@@ -44,7 +44,7 @@ app.get('/api/pokedex', async (req, res) => {
         const parametros = [];
 
         if (req.query.pesquisa) {
-            sql += ` AND (p.nome LIKE ? OR p.id_tipo LIKE ? OR p.id_tipo2 LIKE ?)`;
+            sql += ` AND (p.nome LIKE ? OR t1.nome_tipo LIKE ? OR t2.nome_tipo LIKE ?)`;
 
             parametros.push(
                 '%' + req.query.pesquisa + '%',
@@ -70,16 +70,15 @@ app.get('/api/pokedex', async (req, res) => {
 
 app.post('/api/pokedex', async (req, res) => {
     try {
-        const { id_pokemon, id_tipo, id_tipo2, nome, quant_evolucoes, geracao } = req.body;
+        const { id_tipo, id_tipo2, nome, quant_evolucoes, geracao } = req.body;
 
         const sql = `
             INSERT INTO pokedex
-            (id_pokemon, id_tipo, id_tipo2, nome, quant_evolucoes, geracao)
-            VALUES (?, ?, ?, ?, ?, ?)
+            (id_tipo, id_tipo2, nome, quant_evolucoes, geracao)
+            VALUES (?, ?, ?, ?, ?)
         `;
 
         const [resultado] = await db.query(sql, [
-            id_pokemon,
             id_tipo,
             id_tipo2 ?? null,
             nome,
@@ -105,9 +104,9 @@ app.put('/api/pokedex/:id', async (req, res) => {
     try {
         const id = req.params.id;
 
-        const { id_pokemon, id_tipo, id_tipo2, nome, quant_evolucoes, geracao } = req.body;
+        const { id_tipo, id_tipo2, nome, quant_evolucoes, geracao } = req.body;
 
-        if (!id_pokemon || !id_tipo || !nome || quant_evolucoes == null || geracao == null) {
+        if (!id_tipo || !nome || quant_evolucoes == null || geracao == null) {
             return res.status(400).json({
                 erro: 'Preencha todos os campos.'
             });
@@ -115,14 +114,13 @@ app.put('/api/pokedex/:id', async (req, res) => {
 
         const [resultado] = await db.query(
             `UPDATE pokedex
-             SET id_pokemon = ?,
-                 id_tipo = ?,
+             SET id_tipo = ?,
                  id_tipo2 = ?,
                  nome = ?,
                  quant_evolucoes = ?,
                  geracao = ?
              WHERE id_pokemon = ?`,
-            [id_pokemon, id_tipo, id_tipo2 ?? null, nome, quant_evolucoes, geracao, id]
+            [id_tipo, id_tipo2 ?? null, nome, quant_evolucoes, geracao, id]
         );
 
         if (resultado.affectedRows === 0) {
