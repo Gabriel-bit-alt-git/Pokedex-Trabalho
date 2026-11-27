@@ -120,9 +120,20 @@
     const slot1 = document.getElementById('slot-tipo1');
     const slot2 = document.getElementById('slot-tipo2');
 
+    // Mesma ordem da tabela "tipos" do banco (id -> nome)
+const TIPOS_POR_ID = {
+    1: 'Normal',    2: 'Lutador',   3: 'Voador',
+    4: 'Venenoso',  5: 'Terrestre', 6: 'Pedra',
+    7: 'Inseto',    8: 'Fantasma',  9: 'Aço',
+    10: 'Fogo',     11: 'Água',     12: 'Planta',
+    13: 'Elétrico', 14: 'Psíquico', 15: 'Gelo',
+    16: 'Dragão',   17: 'Sombrio',  18: 'Fada'
+};
+
     // Descobre o nome do tipo a partir do id usando a lista já carregada pela página
     function nomeDoTipo(id, campoNome, campoId) {
         if (!id) return null;
+        if (TIPOS_POR_ID[Number(id)]) return TIPOS_POR_ID[Number(id)];
         try {
             const lista = (typeof listaPokemon !== 'undefined') ? listaPokemon : [];
             for (let i = 0; i < lista.length; i++) {
